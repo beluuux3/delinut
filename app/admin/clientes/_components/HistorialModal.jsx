@@ -38,7 +38,7 @@ export default function HistorialModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Historial de Pedidos - {cliente?.nombre}</DialogTitle>
           <DialogDescription>

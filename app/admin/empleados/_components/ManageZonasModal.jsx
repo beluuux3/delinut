@@ -52,7 +52,7 @@ export default function ManageZonasModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[650px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-gray-900">Gestionar Zonas</DialogTitle>
           <DialogDescription>

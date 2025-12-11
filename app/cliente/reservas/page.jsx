@@ -76,14 +76,37 @@ function ReservaForm() {
           if (menuRes.ok) {
             const menuData = await menuRes.json();
             setMenu(menuData);
+            console.log("📋 Menu cargado:", menuData);
 
             // 2. Fetch Ingredients for exclusions
+            console.log(
+              "🔍 Intentando cargar ingredientes para menu_id:",
+              menuId
+            );
             const ingRes = await fetch(
               `https://backend-solandre.onrender.com/catalogo/menu/${menuId}/ingredientes`
             );
+            console.log("📥 Respuesta ingredientes status:", ingRes.status);
+
             if (ingRes.ok) {
               const ingData = await ingRes.json();
+              console.log("✅ Ingredientes recibidos:", ingData);
               setIngredientes(ingData.ingredientes || []);
+            } else {
+              console.error("❌ Error al cargar ingredientes:", ingRes.status);
+              // Intentar con la fecha en lugar del menu_id
+              console.log("🔄 Intentando con fecha:", fecha);
+              const ingResFecha = await fetch(
+                `https://backend-solandre.onrender.com/catalogo/menu/${fecha}/ingredientes`
+              );
+              if (ingResFecha.ok) {
+                const ingDataFecha = await ingResFecha.json();
+                console.log(
+                  "✅ Ingredientes recibidos (con fecha):",
+                  ingDataFecha
+                );
+                setIngredientes(ingDataFecha.ingredientes || []);
+              }
             }
           }
         }
@@ -172,6 +195,17 @@ function ReservaForm() {
     try {
       const token = Cookies.get("token");
 
+      if (!token) {
+        toast({
+          variant: "destructive",
+          title: "Error de autenticación",
+          description:
+            "No se encontró tu sesión. Por favor, inicia sesión nuevamente.",
+        });
+        router.push("/");
+        return;
+      }
+
       // Group identical configurations
       const groupedItems = [];
 
@@ -210,6 +244,10 @@ function ReservaForm() {
       };
 
       console.log("Payload to send:", JSON.stringify(payload, null, 2));
+      console.log(
+        "Token being used:",
+        token ? `${token.substring(0, 20)}...` : "NO TOKEN"
+      );
 
       const response = await fetch(
         "https://backend-solandre.onrender.com/pedidos",
@@ -231,6 +269,19 @@ function ReservaForm() {
         });
         router.push(`/cliente/pedidos/${data.token_recoger}/track`);
       } else {
+        // Handle 401 Unauthorized specifically
+        if (response.status === 401) {
+          toast({
+            variant: "destructive",
+            title: "Sesión expirada",
+            description:
+              "Tu sesión ha expirado. Por favor, inicia sesión nuevamente.",
+          });
+          Cookies.remove("token");
+          router.push("/");
+          return;
+        }
+
         const error = await response.json();
         console.error("Error API:", error);
 
@@ -352,75 +403,93 @@ function ReservaForm() {
             </CardContent>
           </Card>
 
-          {ingredientes.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Utensils className="h-5 w-5 text-orange-500" />
-                  Personaliza tus platos
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-sm text-gray-500 mb-4">
-                  Puedes elegir qué ingredientes quitar de cada plato
-                  individualmente.
-                </p>
+          {/* Sección de Personalización */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Utensils className="h-5 w-5 text-orange-500" />
+                Personaliza tus platos
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {ingredientes.length === 0 ? (
+                <div className="text-center py-6 text-gray-500">
+                  <p className="text-sm">
+                    No hay ingredientes disponibles para personalizar este menú.
+                  </p>
+                  <p className="text-xs mt-2">
+                    (Verifica que el menú tenga ingredientes configurados en el
+                    sistema)
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Puedes elegir qué ingredientes quitar de cada plato
+                    individualmente.
+                  </p>
 
-                {Array.from({ length: formData.cantidad }).map((_, index) => (
-                  <div
-                    key={index}
-                    className="border rounded-lg p-4 bg-gray-50/50"
-                  >
+                  {Array.from({ length: formData.cantidad }).map((_, index) => (
                     <div
-                      className="flex justify-between items-center cursor-pointer"
-                      onClick={() =>
-                        setExpandedItem(expandedItem === index ? -1 : index)
-                      }
+                      key={index}
+                      className="border rounded-lg p-4 bg-gray-50/50"
                     >
-                      <h3 className="font-medium text-gray-900">
-                        Plato #{index + 1}
-                        {formData.customizations[index]?.length > 0 && (
-                          <span className="ml-2 text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full">
-                            {formData.customizations[index].length} exclusiones
-                          </span>
-                        )}
-                      </h3>
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        {expandedItem === index ? "▼" : "▶"}
-                      </Button>
-                    </div>
-
-                    {expandedItem === index && (
-                      <div className="mt-4 grid grid-cols-2 gap-3 animate-in fade-in slide-in-from-top-2 duration-200">
-                        {ingredientes.map((ing) => (
-                          <div
-                            key={ing.ingrediente_id}
-                            className="flex items-center space-x-2"
-                          >
-                            <Checkbox
-                              id={`ing-${index}-${ing.ingrediente_id}`}
-                              checked={formData.customizations[index]?.includes(
-                                ing.ingrediente_id
-                              )}
-                              onCheckedChange={() =>
-                                toggleExclusion(index, ing.ingrediente_id)
-                              }
-                            />
-                            <label
-                              htmlFor={`ing-${index}-${ing.ingrediente_id}`}
-                              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                            >
-                              Sin {ing.nombre}
-                            </label>
-                          </div>
-                        ))}
+                      <div
+                        className="flex justify-between items-center cursor-pointer"
+                        onClick={() =>
+                          setExpandedItem(expandedItem === index ? -1 : index)
+                        }
+                      >
+                        <h3 className="font-medium text-gray-900">
+                          Plato #{index + 1}
+                          {formData.customizations[index]?.length > 0 && (
+                            <span className="ml-2 text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full">
+                              {formData.customizations[index].length}{" "}
+                              exclusiones
+                            </span>
+                          )}
+                        </h3>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0"
+                        >
+                          {expandedItem === index ? "▼" : "▶"}
+                        </Button>
                       </div>
-                    )}
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          )}
+
+                      {expandedItem === index && (
+                        <div className="mt-4 grid grid-cols-2 gap-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                          {ingredientes.map((ing) => (
+                            <div
+                              key={ing.ingrediente_id}
+                              className="flex items-center space-x-2"
+                            >
+                              <Checkbox
+                                id={`ing-${index}-${ing.ingrediente_id}`}
+                                checked={formData.customizations[
+                                  index
+                                ]?.includes(ing.ingrediente_id)}
+                                onCheckedChange={() =>
+                                  toggleExclusion(index, ing.ingrediente_id)
+                                }
+                              />
+                              <label
+                                htmlFor={`ing-${index}-${ing.ingrediente_id}`}
+                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                              >
+                                Sin {ing.nombre}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </>
+              )}
+            </CardContent>
+          </Card>
 
           <Card>
             <CardHeader>

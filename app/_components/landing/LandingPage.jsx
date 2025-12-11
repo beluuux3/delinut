@@ -3,7 +3,7 @@
 import Header from "./Header";
 import HeroCarousel from "./HeroCarousel";
 import MenuSemanal from "./MenuSemanal";
-import ComoRealizarPedido from "./ComoRealizarPedido";
+
 import SobreNosotros from "./SobreNosotros";
 import Contacto from "./Contacto";
 import Footer from "./Footer";
@@ -15,7 +15,7 @@ export default function LandingPage() {
       <main className="pt-20">
         <HeroCarousel />
         <MenuSemanal />
-        <ComoRealizarPedido />
+
         <SobreNosotros />
         <Contacto />
       </main>

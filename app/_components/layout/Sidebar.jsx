@@ -22,7 +22,6 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import EditProfileModal from "./EditProfileModal";
 
 const navigation = [
   { id: "inicio", name: "Inicio", icon: Home, href: "/admin/inicio" },
@@ -50,10 +49,14 @@ const navigation = [
   },
 ];
 
-export default function Sidebar({ isOpen = true, onClose, onToggle }) {
+export default function Sidebar({
+  isOpen = true,
+  onClose,
+  onToggle,
+  onEditProfile,
+}) {
   const router = useRouter();
   const pathname = usePathname();
-  const [showEditModal, setShowEditModal] = useState(false);
   const [userName, setUserName] = useState("Admin");
   const [userEmail, setUserEmail] = useState("admin@delinut.com");
   const [initials, setInitials] = useState("A");
@@ -83,7 +86,9 @@ export default function Sidebar({ isOpen = true, onClose, onToggle }) {
   };
 
   const handleEditProfile = () => {
-    setShowEditModal(true);
+    if (onEditProfile) {
+      onEditProfile();
+    }
   };
 
   const handleNavigation = (href) => {
@@ -228,9 +233,6 @@ export default function Sidebar({ isOpen = true, onClose, onToggle }) {
             </button>
           </div>
         </div>
-        {showEditModal && (
-          <EditProfileModal onClose={() => setShowEditModal(false)} />
-        )}
       </div>
     </>
   );

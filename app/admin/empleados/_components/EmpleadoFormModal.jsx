@@ -79,7 +79,7 @@ export default function EmpleadoFormModal({
   };
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[700px]">
+      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-gray-900">
             {isEdit ? "Editar Empleado" : "Crear Nuevo Empleado"}
@@ -88,8 +88,11 @@ export default function EmpleadoFormModal({
             {isEdit ? "Modifica la información del empleado" : ""}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={onSubmit}>
-          <div className="py-4">
+        <form
+          onSubmit={onSubmit}
+          className="flex flex-col flex-1 overflow-hidden"
+        >
+          <div className="py-4 overflow-y-auto px-1">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="nombre_completo" className="text-gray-600">

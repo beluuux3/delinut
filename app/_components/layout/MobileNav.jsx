@@ -28,7 +28,6 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import EditProfileModal from "./EditProfileModal";
 
 const navigation = [
   { id: "inicio", name: "Inicio", icon: Home, href: "/admin/inicio" },
@@ -56,11 +55,10 @@ const navigation = [
   },
 ];
 
-export default function MobileNav() {
+export default function MobileNav({ onEditProfile }) {
   const router = useRouter();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
 
   const user =
     typeof window !== "undefined"
@@ -196,9 +194,6 @@ export default function MobileNav() {
           </SheetContent>
         </Sheet>
       </div>
-      {showEditModal && (
-        <EditProfileModal onClose={() => setShowEditModal(false)} />
-      )}
-    </div>
+    </>
   );
 }

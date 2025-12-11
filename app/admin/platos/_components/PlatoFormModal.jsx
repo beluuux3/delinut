@@ -190,7 +190,7 @@ export default function PlatoFormModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle>
             {isViewMode
@@ -203,8 +203,12 @@ export default function PlatoFormModal({
             {isViewMode ? "Detalles del plato" : "Completa los datos del plato"}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={onSubmit}>
-          <div className="space-y-4 py-4">
+        <form
+          onSubmit={onSubmit}
+          className="flex flex-col flex-1 overflow-hidden"
+        >
+          <div className="space-y-4 py-4 overflow-y-auto px-1">
+            {/* Contenedor con scroll */}
             <div className="space-y-2">
               <Label htmlFor="nombre">Nombre del Plato</Label>
               <Input
@@ -327,7 +331,7 @@ export default function PlatoFormModal({
                   </span>
                 </div>
               ) : (
-                <div className="space-y-2 max-h-60 overflow-y-auto">
+                <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
                   {(formData.ingredientes || []).length === 0 ? (
                     <p className="text-sm text-gray-500 text-center py-4">
                       No hay ingredientes agregados

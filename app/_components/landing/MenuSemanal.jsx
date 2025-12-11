@@ -7,8 +7,14 @@ import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import LoadingFood from "../../../public/loadingfood.gif";
 import {
   Calendar,
   Clock,
@@ -35,34 +41,29 @@ export default function MenuSemanal() {
   // Colores para cada día de la semana
   const dayColors = [
     {
-      bg: "bg-red-50",
       border: "border-red-400",
       text: "text-red-600",
-      header: "bg-red-400",
+      header: "bg-red-200",
     },
     {
-      bg: "bg-green-50",
       border: "border-green-400",
       text: "text-green-600",
-      header: "bg-green-400",
+      header: "bg-green-200",
     },
     {
-      bg: "bg-blue-50",
       border: "border-blue-400",
       text: "text-blue-600",
-      header: "bg-blue-400",
+      header: "bg-blue-200",
     },
     {
-      bg: "bg-yellow-50",
       border: "border-yellow-400",
       text: "text-yellow-600",
-      header: "bg-yellow-400",
+      header: "bg-yellow-200",
     },
     {
-      bg: "bg-purple-50",
       border: "border-purple-400",
       text: "text-purple-600",
-      header: "bg-purple-400",
+      header: "bg-purple-200",
     },
   ];
 
@@ -76,7 +77,7 @@ export default function MenuSemanal() {
       const today = new Date();
       const currentDay = today.getDay();
 
-      // Si es sábado (6) o domingo (0), mostrar la próxima semana
+      // Si es sábado (6) o domingo (0) nos vamos a la proxima semana
       if (currentDay === 6 || currentDay === 0) {
         const daysToAdd = currentDay === 6 ? 2 : 1;
         today.setDate(today.getDate() + daysToAdd);
@@ -209,7 +210,16 @@ export default function MenuSemanal() {
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
               Menú Semanal
             </h2>
-            <p className="text-gray-600">Cargando menú...</p>
+            <div className="flex justify-center items-center rounded-lg overflow-hidden">
+              <Image
+                src={LoadingFood}
+                alt="Cargando..."
+                width={500}
+                height={500}
+                unoptimized
+                className="rounded-full"
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -603,6 +613,9 @@ export default function MenuSemanal() {
         <DialogContent className="sm:max-w-4xl p-0">
           <VisuallyHidden>
             <DialogTitle>Iniciar Sesión</DialogTitle>
+            <DialogDescription>
+              Inicia sesión para realizar tu pedido
+            </DialogDescription>
           </VisuallyHidden>
           <AuthModal
             onClose={() => {
@@ -622,6 +635,9 @@ export default function MenuSemanal() {
         <DialogContent className="max-w-6xl max-h-[95vh] overflow-y-auto p-0 bg-gradient-to-br from-amber-50 via-white to-orange-50">
           <VisuallyHidden>
             <DialogTitle>Detalle del Menú</DialogTitle>
+            <DialogDescription>
+              Información completa del menú del día
+            </DialogDescription>
           </VisuallyHidden>
 
           {selectedMenuDetail && (

@@ -39,10 +39,6 @@ export default function SobreNosotros() {
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
             Sobre Nosotros
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            En Delinut nos dedicamos a brindarte la mejor experiencia en
-            almuerzos saludables
-          </p>
         </div>
 
         {/* Content Grid */}
@@ -103,19 +99,6 @@ export default function SobreNosotros() {
               </div>
             );
           })}
-        </div>
-
-        {/* Mission Statement */}
-        <div className="mt-16 bg-green-600 rounded-2xl p-8 md:p-12 text-white text-center">
-          <h3 className="text-3xl font-bold mb-4">Nuestra Misión</h3>
-          <p className="text-lg max-w-3xl mx-auto leading-relaxed">
-            Facilitar una vida saludable a los profesionales urbanos, ofreciendo
-            almuerzos nutricionalmente balanceados, deliciosos y puntuales,
-            diseñados por expertos en dietética. Nos dedicamos a hacer que la
-            alimentación de calidad sea accesible y conveniente, adaptándonos a
-            las necesidades de nuestros clientes, incluyendo opciones seguras y
-            específicas para personas con condiciones de salud como la diabetes.
-          </p>
         </div>
       </div>
     </section>

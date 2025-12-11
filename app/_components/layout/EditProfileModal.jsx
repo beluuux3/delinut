@@ -1,6 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import Cookies from "js-cookie";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 export default function EditProfileModal({ onClose }) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [userData, setUserData] = useState({
     nombre_completo: "",
     email: "",
@@ -20,6 +22,7 @@ export default function EditProfileModal({ onClose }) {
   });
 
   useEffect(() => {
+    setMounted(true);
     const user = JSON.parse(Cookies.get("user") || "{}");
     setUserData({
       nombre_completo: user.nombre_completo || "",
@@ -110,140 +113,327 @@ export default function EditProfileModal({ onClose }) {
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-900">Editar Perfil</h2>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+  if (!mounted) return null;
+
+  const modalContent = (
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: "100vw",
+        height: "100vh",
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+        zIndex: 999999,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "20px",
+      }}
+      onClick={onClose}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          backgroundColor: "white",
+          borderRadius: "8px",
+          maxWidth: "600px",
+          width: "100%",
+          maxHeight: "90vh",
+          overflow: "auto",
+          position: "relative",
+          boxShadow:
+            "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+        }}
+      >
+        {/* Header */}
+        <div
+          style={{
+            position: "sticky",
+            top: 0,
+            backgroundColor: "white",
+            borderBottom: "1px solid #e5e7eb",
+            borderRadius: "8px 8px 0 0",
+            zIndex: 1,
+          }}
+        >
+          <div
+            style={{
+              padding: "20px 24px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
           >
-            <X className="w-5 h-5 text-gray-600" />
-          </button>
+            <h2
+              style={{
+                fontSize: "20px",
+                fontWeight: "bold",
+                color: "#111827",
+              }}
+            >
+              Editar Perfil
+            </h2>
+            <button
+              onClick={onClose}
+              style={{
+                padding: "8px",
+                borderRadius: "8px",
+                border: "none",
+                backgroundColor: "transparent",
+                cursor: "pointer",
+              }}
+              onMouseOver={(e) =>
+                (e.currentTarget.style.backgroundColor = "#f3f4f6")
+              }
+              onMouseOut={(e) =>
+                (e.currentTarget.style.backgroundColor = "transparent")
+              }
+            >
+              <X style={{ width: "24px", height: "24px", color: "#4b5563" }} />
+            </button>
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div>
-            <Label
-              htmlFor="nombre_completo"
-              className="text-gray-600 text-sm mb-1"
+        {/* Content */}
+        <div style={{ padding: "24px" }}>
+          <form
+            onSubmit={handleSubmit}
+            style={{ display: "flex", flexDirection: "column", gap: "24px" }}
+          >
+            {/* Información Personal */}
+            <div
+              style={{
+                backgroundColor: "white",
+                borderRadius: "8px",
+                border: "1px solid #e5e7eb",
+                padding: "24px",
+                boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+              }}
             >
-              Nombre Completo
-            </Label>
-            <Input
-              id="nombre_completo"
-              type="text"
-              value={userData.nombre_completo}
-              onChange={(e) =>
-                setUserData({ ...userData, nombre_completo: e.target.value })
-              }
-              className="h-9 text-sm border-gray-300 text-gray-700 focus:border-orange-500 focus:ring-orange-500"
-              required
-            />
-          </div>
+              <h3
+                style={{
+                  fontSize: "18px",
+                  fontWeight: "600",
+                  marginBottom: "16px",
+                }}
+              >
+                Información Personal
+              </h3>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: "24px",
+                }}
+              >
+                <div style={{ gridColumn: "1 / -1" }}>
+                  <Label
+                    htmlFor="nombre_completo"
+                    style={{
+                      display: "block",
+                      marginBottom: "8px",
+                      fontWeight: "500",
+                    }}
+                  >
+                    Nombre Completo
+                  </Label>
+                  <Input
+                    id="nombre_completo"
+                    type="text"
+                    value={userData.nombre_completo}
+                    onChange={(e) =>
+                      setUserData({
+                        ...userData,
+                        nombre_completo: e.target.value,
+                      })
+                    }
+                    required
+                    style={{ height: "44px", fontSize: "16px" }}
+                  />
+                </div>
 
-          <div>
-            <Label htmlFor="email" className="text-gray-600 text-sm mb-1">
-              Correo Electrónico
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              value={userData.email}
-              className="h-9 text-sm bg-gray-100 text-gray-500 cursor-not-allowed"
-              disabled
-              readOnly
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              El correo no se puede modificar
-            </p>
-          </div>
+                <div>
+                  <Label
+                    htmlFor="email"
+                    style={{
+                      display: "block",
+                      marginBottom: "8px",
+                      fontWeight: "500",
+                    }}
+                  >
+                    Correo Electrónico
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={userData.email}
+                    disabled
+                    readOnly
+                    style={{
+                      height: "44px",
+                      fontSize: "16px",
+                      backgroundColor: "#f3f4f6",
+                      cursor: "not-allowed",
+                    }}
+                  />
+                  <p
+                    style={{
+                      fontSize: "14px",
+                      color: "#6b7280",
+                      marginTop: "4px",
+                    }}
+                  >
+                    El correo no se puede modificar
+                  </p>
+                </div>
 
-          <div>
-            <Label htmlFor="telefono" className="text-gray-600 text-sm mb-1">
-              Teléfono
-            </Label>
-            <Input
-              id="telefono"
-              type="tel"
-              value={userData.telefono}
-              onChange={(e) =>
-                setUserData({ ...userData, telefono: e.target.value })
-              }
-              className="h-9 text-sm border-gray-300 text-gray-700 focus:border-orange-500 focus:ring-orange-500"
-            />
-          </div>
-
-          <div className="pt-4 border-t border-gray-200">
-            <p className="text-sm text-gray-600 mb-4">
-              Deja estos campos vacíos si no deseas cambiar tu contraseña
-            </p>
-
-            <div className="space-y-4">
-              <div>
-                <Label
-                  htmlFor="password"
-                  className="text-gray-600 text-sm mb-1"
-                >
-                  Nueva Contraseña
-                </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={userData.password}
-                  onChange={(e) =>
-                    setUserData({ ...userData, password: e.target.value })
-                  }
-                  className="h-9 text-sm border-gray-300 text-gray-700 focus:border-orange-500 focus:ring-orange-500"
-                  placeholder="••••••••"
-                />
-              </div>
-
-              <div>
-                <Label
-                  htmlFor="confirmPassword"
-                  className="text-gray-600 text-sm mb-1"
-                >
-                  Confirmar Contraseña
-                </Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  value={userData.confirmPassword}
-                  onChange={(e) =>
-                    setUserData({
-                      ...userData,
-                      confirmPassword: e.target.value,
-                    })
-                  }
-                  className="h-9 text-sm border-gray-300 text-gray-700 focus:border-orange-500 focus:ring-orange-500"
-                  placeholder="••••••••"
-                />
+                <div>
+                  <Label
+                    htmlFor="telefono"
+                    style={{
+                      display: "block",
+                      marginBottom: "8px",
+                      fontWeight: "500",
+                    }}
+                  >
+                    Teléfono
+                  </Label>
+                  <Input
+                    id="telefono"
+                    type="tel"
+                    value={userData.telefono}
+                    onChange={(e) =>
+                      setUserData({ ...userData, telefono: e.target.value })
+                    }
+                    placeholder="78787878"
+                    style={{ height: "44px", fontSize: "16px" }}
+                  />
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="flex gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              className="flex-1"
-              disabled={loading}
+            {/* Cambiar Contraseña */}
+            <div
+              style={{
+                backgroundColor: "white",
+                borderRadius: "8px",
+                border: "1px solid #e5e7eb",
+                padding: "24px",
+                boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+              }}
             >
-              Cancelar
-            </Button>
-            <Button
-              type="submit"
-              className="flex-1 bg-orange-500 hover:bg-orange-600"
-              disabled={loading}
-            >
-              {loading ? "Guardando..." : "Guardar Cambios"}
-            </Button>
-          </div>
-        </form>
+              <h3
+                style={{
+                  fontSize: "18px",
+                  fontWeight: "600",
+                  marginBottom: "8px",
+                }}
+              >
+                Cambiar Contraseña
+              </h3>
+              <p
+                style={{
+                  fontSize: "14px",
+                  color: "#6b7280",
+                  marginBottom: "16px",
+                }}
+              >
+                Deja estos campos vacíos si no deseas cambiar tu contraseña
+              </p>
+
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: "24px",
+                }}
+              >
+                <div>
+                  <Label
+                    htmlFor="password"
+                    style={{
+                      display: "block",
+                      marginBottom: "8px",
+                      fontWeight: "500",
+                    }}
+                  >
+                    Nueva Contraseña
+                  </Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={userData.password}
+                    onChange={(e) =>
+                      setUserData({ ...userData, password: e.target.value })
+                    }
+                    placeholder="••••••••"
+                    autoComplete="new-password"
+                    style={{ height: "44px", fontSize: "16px" }}
+                  />
+                </div>
+
+                <div>
+                  <Label
+                    htmlFor="confirmPassword"
+                    style={{
+                      display: "block",
+                      marginBottom: "8px",
+                      fontWeight: "500",
+                    }}
+                  >
+                    Confirmar Contraseña
+                  </Label>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    value={userData.confirmPassword}
+                    onChange={(e) =>
+                      setUserData({
+                        ...userData,
+                        confirmPassword: e.target.value,
+                      })
+                    }
+                    placeholder="••••••••"
+                    autoComplete="new-password"
+                    style={{ height: "44px", fontSize: "16px" }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Botones de acción */}
+            <div style={{ display: "flex", gap: "12px", paddingTop: "16px" }}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                disabled={loading}
+                style={{ flex: 1, height: "48px", fontSize: "16px" }}
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                disabled={loading}
+                style={{
+                  flex: 1,
+                  height: "48px",
+                  fontSize: "16px",
+                  backgroundColor: "#f97316",
+                }}
+                className="bg-orange-500 hover:bg-orange-600"
+              >
+                {loading ? "Guardando..." : "Guardar Cambios"}
+              </Button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }

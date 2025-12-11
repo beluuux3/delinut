@@ -30,7 +30,7 @@ export default function IngredienteFormModal({
 }) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle>
             {isViewMode
@@ -45,8 +45,11 @@ export default function IngredienteFormModal({
               : "Completa los datos del ingrediente"}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={onSubmit}>
-          <div className="space-y-4 py-4">
+        <form
+          onSubmit={onSubmit}
+          className="flex flex-col flex-1 overflow-hidden"
+        >
+          <div className="space-y-4 py-4 overflow-y-auto px-1">
             <div className="space-y-2">
               <Label htmlFor="nombre">Nombre del Ingrediente</Label>
               <Input

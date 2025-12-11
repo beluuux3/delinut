@@ -86,9 +86,9 @@ export default function Header() {
                 <Image
                   src="/LogoDelinut.png"
                   alt="Delinut Logo"
-                  width={110}
+                  width={100}
                   height={50}
-                  style={{ width: "auto", height: "auto" }}
+                  style={{ width: "auto", height: "65px" }}
                   className="cursor-pointer"
                 />
               </Link>
